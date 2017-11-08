@@ -35,6 +35,11 @@ import { colors } from 'theme';
 
 import AddHolding from './AddHolding'
 import ViewHolding from './ViewHolding'
+import Webpage from './Webpage'
+
+const uri_prefix = 'https://www.barchart.com/stocks/quotes/'
+const uri_suffix = '/interactive-chart'
+
 
 let styles = {};
 
@@ -102,10 +107,11 @@ class Home extends React.Component {
   }
 
   renderHolding(holding, index) {
+    const uri = uri_prefix + holding.ticker + uri_suffix
     return (
       <TouchableHighlight
         onPress={() => {
-          this.props.navigation.navigate('ViewHolding', {holding})
+          this.props.navigation.navigate('Web', {uri})
         }}
         underlayColor='transparent'
         key={holding.holdingId}
@@ -203,7 +209,8 @@ const HomeRouteStack = {
       }
     }
   },
-  ViewHolding: { screen: ViewHolding }
+  ViewHolding: { screen: ViewHolding },
+  Web: { screen: Webpage }
 };
 
 const HomeNav = StackNavigator(HomeRouteStack);
