@@ -19,18 +19,13 @@ import { WithAuth } from './lib/Categories/Auth/Components';
 
 import First from './src/Screens/First';
 import Splash from './src/Screens/Splash';
+import Home from './src/Screens/Home';
 import SignOut from './src/Components/SignOut';
 import ForgotPassword from './src/Components/ForgotPassword';
 
-
-import Portfolio from './src/Screens/Portfolio'
-
-
-
-
 const App = DrawerNavigator({
   Home: {
-    screen: props => <Portfolio rootNavigator={props.navigation} {...props.screenProps } />,
+    screen: props => <Home rootNavigator={props.navigation} {...props.screenProps } />,
   },
   ForgotPassword: {
     screen: (props) => {
