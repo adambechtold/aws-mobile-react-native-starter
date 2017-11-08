@@ -35,6 +35,8 @@ import SideMenuIcon from '../Components/SideMenuIcon';
 import awsmobile from '../../aws-exports';
 import { colors } from 'theme';
 
+import AddHolding from './AddHolding'
+
 let styles = {};
 
 class Home extends React.Component {
@@ -130,8 +132,8 @@ class Home extends React.Component {
       outputRange: ['0deg', '360deg'],
     });
 
-    const AddPetRoutes = StackNavigator({
-      AddPet: { screen: AddPet },
+    const AddHoldingRoutes = StackNavigator({
+      AddHolding: { screen: AddHolding },
       UploadPhoto: { screen: UploadPhoto },
     });
 
@@ -166,7 +168,7 @@ class Home extends React.Component {
           visible={this.state.modalVisible}
           onRequestClose={this.toggleModal}
         >
-          <AddPetRoutes screenProps={{ handleRetrievePet: this.handleRetrievePet, toggleModal: this.toggleModal }} />
+          <AddHoldingRoutes screenProps={{ handleRetrievePet: this.handleRetrievePet, toggleModal: this.toggleModal }} />
         </Modal>
       </View >
     );
