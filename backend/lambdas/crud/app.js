@@ -21,6 +21,7 @@ const app = express();
 app.use(awsServerlessExpressMiddleware.eventContext({ deleteHeaders: false }), bodyParser.json());
 
 const PETS_TABLE_NAME = `${process.env.MOBILE_HUB_DYNAMIC_PREFIX}-pets`;
+const HOLDINGS_TABLE_NAME = `${process.env.MOBILE_HUB_DYNAMIC_PREFIX}-holdings`;
 
 AWS.config.update({ region: process.env.REGION });
 
@@ -74,10 +75,69 @@ app.post('/items/pets', (req, res) => {
     if (err) {
       console.log(err)
       res.status(500).json({
-        message: 'Could not insert pet'
+        message: 'Could not insert pet',
+        error: err
       }).end();
     } else {
       res.json(pet);
+    }
+  });
+});
+
+
+app.get('/items/holdings', (req, res) => {
+  // performs a DynamoDB Query operation to extract all records for the cognitoIdentityId in the table
+  dynamoDb.query({
+    TableName: HOLDINGS_TABLE_NAME,
+    KeyConditions: {
+      userId: {
+        ComparisonOperator: 'EQ',
+        AttributeValueList: [req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH],
+      },
+    },
+  }, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({
+        message: 'Could not load holdings',
+        error: err
+      }).end();
+    } else {
+      res.json(data.Items).end();
+    }
+  });
+});
+
+app.post('/items/holdings', (req, res) => {
+  if (!req.body.ticker || !req.body.shares || !req.body.averageCost) {
+    res.status(400).json({
+      message: 'You must specify a ticker, share count, and averageCost',
+    }).end();
+    return;
+  }
+
+  req.body.shares = parseInt(req.body.shares)
+  req.body.averageCost = parseFloat(req.body.averageCost)
+
+  const holding = Object.assign({}, req.body);
+
+  Object.keys(holding).forEach(key => (holding[key] === '' && delete holding[key]));
+
+  holding.userId = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  holding.holdingId = uuid.v1();
+
+  dynamoDb.put({
+    TableName: HOLDINGS_TABLE_NAME,
+    Item: holding,
+  }, (err, data) => {
+    if (err) {
+      console.log(err)
+      res.status(500).json({
+        message: 'Could not insert holding',
+        error: err
+      }).end();
+    } else {
+      res.json(holding);
     }
   });
 });
