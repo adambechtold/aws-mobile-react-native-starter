@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-    View,
-    ScrollView,
-    Text,
-    Animated,
-    StyleSheet,
-    Image,
-    Easing,
-    TouchableHighlight,
-    Modal,
+  View,
+  ScrollView,
+  Text,
+  Animated,
+  StyleSheet,
+  Image,
+  Easing,
+  TouchableHighlight,
+  Modal,
 } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { DrawerNavigator, NavigationActions, StackNavigator } from 'react-navigation';
@@ -27,3 +27,4 @@ import Webpage from './Webpage'
 
 const uri_prefix = 'https://www.barchart.com/stocks/quotes/'
 const uri_suffix = '/interactive-chart'
+

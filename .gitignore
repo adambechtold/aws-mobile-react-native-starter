@@ -1,10 +1,14 @@
 aws-exports.js
 .vscode
 
-# lambda packageing
+# lambda packaging
 *dist*
 *__pycache__*
 *.pyc
+
+# secrets
+*secret*
+
 
 
 .expo/

@@ -36,10 +36,13 @@ import { colors } from 'theme';
 import AddHolding from './AddHolding'
 import ViewHolding from './ViewHolding'
 import Webpage from './Webpage'
+import HoldingToggleButton from '../Components/HoldingToggleButton'
 
-let {getTickerUri} = require('../Utils/SharedFunctions')
+let { getTickerChartUri, getCurrentPrice } = require('../Utils/SharedFunctions')
 
 let styles = {};
+
+const display_options = ['shares', 'averageCost', 'currentPrice', 'totalEquity']
 
 class Home extends React.Component {
   constructor(props) {
@@ -48,6 +51,7 @@ class Home extends React.Component {
     this.handleRetrieveHolding = this.handleRetrieveHolding.bind(this)
     this.animate = this.animate.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
+    this.toggleDisplay = this.toggleDisplay.bind(this);
 
     this.animatedIcon = new Animated.Value(0);
 
@@ -55,7 +59,19 @@ class Home extends React.Component {
       apiResponse: null,
       loading: true,
       modalVisible: false,
+      current_display: 'shares'
     }
+  }
+
+  toggleDisplay() {
+    let max = display_options.length;
+    let current_index = display_options.indexOf(this.state.current_display)
+    let new_current = (current_index + 1) % max
+    console.log(new_current)
+    this.setState({
+      apiResponse: this.state.apiResponse,
+      current_display: display_options[new_current]
+    })
   }
 
   componentDidMount() {
@@ -105,20 +121,29 @@ class Home extends React.Component {
   }
 
   renderHolding(holding, index) {
-    const uri = getTickerUri(holding.ticker)
+    const uri = getTickerChartUri(holding.ticker)
+
     return (
-      <TouchableHighlight
-        onPress={() => {
-          this.props.navigation.navigate('Web', {uri})
-        }}
-        underlayColor='transparent'
-        key={holding.holdingId}
-      >
-        <View style={styles.holdingInfoContainer}>
-          <Text style={styles.holdingInfo}>{holding.ticker}</Text>
-          <Text style={styles.holdingInfo}>${holding.averageCost.toFixed(2)}</Text>
-        </View>
-      </TouchableHighlight>
+      <View key={index}>
+        <TouchableHighlight
+          onPress={() => {
+            this.props.navigation.navigate('Web', { uri })
+          }}
+          underlayColor='transparent'
+          key={holding.holdingId}
+        >
+          <View style={styles.holdingInfoContainer}>
+            <Text style={styles.holdingInfo}>{holding.ticker}</Text>
+            <View>
+              <HoldingToggleButton
+                display={this.state.current_display}
+                toggle={this.toggleDisplay}
+                holding={holding}
+              />
+            </View>
+          </View>
+        </TouchableHighlight>
+      </View>
     )
   }
 
