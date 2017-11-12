@@ -4,6 +4,7 @@ aws-exports.js
 # lambda packageing
 *dist*
 *__pycache__*
+*.pyc
 
 
 .expo/
