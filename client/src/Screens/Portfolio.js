@@ -37,9 +37,7 @@ import AddHolding from './AddHolding'
 import ViewHolding from './ViewHolding'
 import Webpage from './Webpage'
 
-const uri_prefix = 'https://www.barchart.com/stocks/quotes/'
-const uri_suffix = '/interactive-chart'
-
+let {getTickerUri} = require('../Utils/SharedFunctions')
 
 let styles = {};
 
@@ -107,7 +105,7 @@ class Home extends React.Component {
   }
 
   renderHolding(holding, index) {
-    const uri = uri_prefix + holding.ticker + uri_suffix
+    const uri = getTickerUri(holding.ticker)
     return (
       <TouchableHighlight
         onPress={() => {
@@ -117,7 +115,8 @@ class Home extends React.Component {
         key={holding.holdingId}
       >
         <View style={styles.holdingInfoContainer}>
-          <Text style={styles.holdingInfoName}>{holding.ticker}</Text>
+          <Text style={styles.holdingInfo}>{holding.ticker}</Text>
+          <Text style={styles.holdingInfo}>${holding.averageCost.toFixed(2)}</Text>
         </View>
       </TouchableHighlight>
     )
@@ -186,12 +185,14 @@ styles = StyleSheet.create({
     marginVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between'
   },
-  holdingInfoName: {
+  holdingInfo: {
     color: colors.darkGray,
     fontSize: 20,
     marginLeft: 17
   },
+
 })
 
 

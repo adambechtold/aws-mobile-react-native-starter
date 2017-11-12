@@ -24,6 +24,7 @@ import ForgotPassword from './src/Components/ForgotPassword';
 
 
 import Portfolio from './src/Screens/Portfolio'
+// import Recommendations from './src/Screen/Recommendations'
 
 
 
@@ -32,6 +33,9 @@ const App = DrawerNavigator({
   Home: {
     screen: props => <Portfolio rootNavigator={props.navigation} {...props.screenProps } />,
   },
+  // Recommendations: {
+  //   screen: props => <Recommendations rootNavigator={props.navigation} {...props.screenProps } />,
+  // },
   ForgotPassword: {
     screen: (props) => {
       return <ForgotPassword {...props.screenProps} onCancel={() => props.navigation.navigate('Home')} onSuccess={() => props.navigation.navigate('Home')} />
