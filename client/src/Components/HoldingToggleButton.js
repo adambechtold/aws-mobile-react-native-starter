@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Text } from 'react-native';
 import { Button } from 'react-native-elements'
 
+let { getCurrentPrice } = require('../Utils/SharedFunctions')
+
 
 const display_options = ['shares', 'averageCost', 'currentPrice', 'totalEquity']
 const holdingDisplay = {
@@ -17,26 +19,26 @@ export default class HoldingToggleButton extends Component {
 
     this.state = {
       display_type: this.props.display,
-      display_text: 'loading'
+      display_text: 'loading',
     }
 
     this.get_display_text = this.get_display_text.bind(this)
-
   }
 
   componentWillMount() {
-    console.log('component will mount', holdingDisplay[this.state.display_type](this.props.holding))
-    this.get_display_text()
+    this.get_display_text(this.props)
   }
 
-  get_display_text() {
-    let type = this.state.display_type;
-    console.log('changing display')
+  componentWillReceiveProps(nextProps) {
+    this.get_display_text(nextProps)
+  }
+
+  get_display_text(props) {
+    let type = props.display;
     this.setState({
-      display_type: this.props.display,
-      display_text: holdingDisplay[type](this.props.holding)
+      display_type: props.display,
+      display_text: holdingDisplay[type](props.holding)
     })
-    console.log('changed display')
   }
 
   render() {

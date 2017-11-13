@@ -21,6 +21,7 @@ import {
   Easing,
   TouchableHighlight,
   Modal,
+  FlatList
 } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { DrawerNavigator, NavigationActions, StackNavigator } from 'react-navigation';
@@ -56,10 +57,10 @@ class Home extends React.Component {
     this.animatedIcon = new Animated.Value(0);
 
     this.state = {
-      apiResponse: null,
       loading: true,
       modalVisible: false,
-      current_display: 'shares'
+      current_display: 'shares',
+      holdingList: null,
     }
   }
 
@@ -67,9 +68,8 @@ class Home extends React.Component {
     let max = display_options.length;
     let current_index = display_options.indexOf(this.state.current_display)
     let new_current = (current_index + 1) % max
-    console.log(new_current)
     this.setState({
-      apiResponse: this.state.apiResponse,
+      holdingList: this.state.holdingList,
       current_display: display_options[new_current]
     })
   }
@@ -101,9 +101,11 @@ class Home extends React.Component {
     };
 
     API.restRequest(requestParams).then(apiResponse => {
-      this.setState({ apiResponse, loading: false });
+      this.setState({ holdingList: apiResponse, loading: false });
     }).catch(e => {
-      this.setState({ apiResponse: e.message, loading: false });
+      console.log('error in api request')
+      console.log(e)
+      this.setState({ holdingList: e.message, loading: false });
     });
   }
 
@@ -120,25 +122,24 @@ class Home extends React.Component {
     this.setState((state) => ({ modalVisible: !state.modalVisible }));
   }
 
-  renderHolding(holding, index) {
-    const uri = getTickerChartUri(holding.ticker)
+  renderHolding(input) {
+    const uri = getTickerChartUri(input.item.ticker)
 
     return (
-      <View key={index}>
+      <View key={input.index}>
         <TouchableHighlight
           onPress={() => {
             this.props.navigation.navigate('Web', { uri })
           }}
           underlayColor='transparent'
-          key={holding.holdingId}
         >
           <View style={styles.holdingInfoContainer}>
-            <Text style={styles.holdingInfo}>{holding.ticker}</Text>
+            <Text style={styles.holdingInfo}>{input.item.ticker}</Text>
             <View>
               <HoldingToggleButton
                 display={this.state.current_display}
                 toggle={this.toggleDisplay}
-                holding={holding}
+                holding={input.item}
               />
             </View>
           </View>
@@ -148,7 +149,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { loading, apiResponse } = this.state;
+    const { loading, holdingList } = this.state;
     const spin = this.animatedIcon.interpolate({
       inputRange: [0, 1],
       outputRange: ['0deg', '360deg'],
@@ -172,18 +173,15 @@ class Home extends React.Component {
             color={colors.primary}
           />
         </View>}
-        <ScrollView style={[{ flex: 1, zIndex: 0 }]} contentContainerStyle={[loading && { justifyContent: 'center', alignItems: 'center' }]}>
-          {loading && <Animated.View style={{ transform: [{ rotate: spin }] }}><Icon name='autorenew' color={colors.grayIcon} /></Animated.View>}
-          {
-            !loading &&
-            <View style={styles.container}>
-              <Text style={styles.title}>My Portfolio</Text>
-              {
-                apiResponse.map((holding, index) => this.renderHolding(holding, index))
-              }
-            </View>
-          }
-        </ScrollView>
+        {loading && <Animated.View style={{ transform: [{ rotate: spin }] }}><Icon name='autorenew' color={colors.grayIcon} /></Animated.View>}
+        {!loading &&
+          <FlatList
+            style={[{ flex: 1, zIndex: 0 }]}
+            contentContainerStyle={[loading && { justifyContent: 'center', alignItems: 'center' }]}
+            data={holdingList}
+            renderItem={((item) => this.renderHolding(item))}
+          />}
+
         <Modal
           animationType={"slide"}
           transparent={false}
